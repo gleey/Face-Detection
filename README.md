@@ -13,13 +13,10 @@
 face_detection_project/
 ├── dataset/
 │   ├── orang1/
-│   │   ├── frontal/          ← Scenario A
-│   │   ├── side_pose/        ← Scenario B
-│   │   ├── multiple_faces/   ← Scenario C
-│   │   ├── low_light/        ← Scenario D
-│   │   ├── occlusion/        ← Scenario E
-│   │   ├── small_face/       ← Scenario F
-│   │   └── webcam_live/      ← Scenario G
+│   │   ├── frontal/
+│   │   ├── side_pose/ 
+│   │   ├── low_light/
+│   │   ├── occlusion/
 │   ├── orang2/
 │   │   └── (sama seperti orang1)
 │   └── orang3/
@@ -52,7 +49,7 @@ pip install -r requirements.txt
 ## Cara Pakai
 
 ### 1. Ganti Nama Folder Anggota (Opsional)
-Di `run_pipeline.py` baris 22, ganti sesuai nama asli anggota:
+Ganti sesuai nama asli anggota:
 ```python
 PEOPLE = ["budi", "siti", "andi"]   # ← sesuaikan
 ```
@@ -79,18 +76,8 @@ python webcam_live.py
 | `S` | Screenshot → simpan ke `dataset/orang1/webcam_live/` |
 | `Q` / `ESC` | Keluar |
 
-> Ganti `orang1` di `webcam_live.py` sesuai siapa yang sedang rekam.
+> Ganti `orang1, orang2, orang3` sesuai nama folder di dataset.
 
-## Format CSV Output
-| Kolom | Keterangan |
-|-------|-----------|
-| `image` | Nama file |
-| `person` | Nama anggota (`orang1`, `orang2`, `orang3`) |
-| `scenario` | Skenario (`frontal`, `side_pose`, dst.) |
-| `detector` | Nama detektor |
-| `n_faces` | Jumlah wajah terdeteksi |
-| `elapsed_ms` | Waktu deteksi (ms) |
-| `faces_json` | Koordinat bbox & confidence |
 
 ## Mengganti Nama Dataset Root
 Jika folder dataset berada di lokasi lain, ubah satu baris di `run_pipeline.py`:
