@@ -1,0 +1,11 @@
+opencv-python>=4.8.0
+mtcnn>=0.1.1
+retina-face>=0.0.17
+deepface>=0.0.93
+numpy>=1.24.0
+matplotlib>=3.7.0
+pandas>=2.0.0
+Pillow>=10.0.0
+tqdm>=4.65.0
+seaborn>=0.12.0
+tf-keras>=2.16.0
