@@ -1,0 +1,9 @@
+# Abaikan semua file gambar berdasarkan ekstensi
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+*.svg
+*.webp
+*.tiff
