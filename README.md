@@ -65,22 +65,9 @@ dataset/orang1/frontal/     → foto wajah lurus
 dataset/orang1/side_pose/   → kepala miring kiri/kanan
 dataset/orang1/low_light/   → kondisi cahaya redup
 dataset/orang1/occlusion/   → wajah tertutup masker/tangan
-dataset/orang1/small_face/  → wajah kecil/jarak jauh
-dataset/orang1/multiple_faces/ → foto kelompok (3+ orang)
 ```
-Target: **15–35 foto per orang** → total 50–100 foto kelompok.
 
-### 3. Jalankan Pipeline Batch
-```bash
-python run_pipeline.py
-```
-Output:
-- Gambar teranotasi per detektor di `results/`
-- Grid perbandingan di `results/comparison/`
-- `results/detection_results.csv`
-- `results/summary_chart.png` (3 chart: wajah, waktu, kontribusi per orang)
-
-### 4. Webcam Real-Time (Scenario G)
+### 3. Webcam Real-Time
 ```bash
 python webcam_live.py
 ```
