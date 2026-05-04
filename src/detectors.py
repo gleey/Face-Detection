@@ -93,34 +93,45 @@ class MTCNNDetector:
 # 3. RETINAFACE
 # ─────────────────────────────────────────────
 class RetinaFaceDetector:
-    def __init__(self, threshold=0.9):
-        from retinaface import RetinaFace
+    def __init__(self, threshold=0.9, resize_to=None):
+        import insightface
+        from insightface.app import FaceAnalysis
         self.name = "RetinaFace"
         self.threshold = threshold
-        self._rf = RetinaFace
+        self.resize_to = resize_to
+        
+        # ctx_id=0 = GPU 0 (RTX 4050), ctx_id=-1 = CPU
+        self.app = FaceAnalysis(name="buffalo_sc", providers=["CUDAExecutionProvider"])
+        self.app.prepare(ctx_id=0, det_size=(640, 640))
 
     def detect(self, image_bgr):
-        """
-        Returns:
-            faces (list of dict): [{"bbox": [x,y,w,h], "confidence": float, "landmarks": dict}]
-            elapsed_ms (float)
-        """
+        import time
+        original_h, original_w = image_bgr.shape[:2]
+
+        if self.resize_to:
+            rw, rh = self.resize_to
+            infer_img = cv2.resize(image_bgr, (rw, rh))
+            scale_x, scale_y = original_w / rw, original_h / rh
+        else:
+            infer_img = image_bgr
+            scale_x = scale_y = 1.0
+
         t0 = time.perf_counter()
-        detections = self._rf.detect_faces(image_bgr, threshold=self.threshold)
+        # insightface pakai RGB
+        img_rgb = cv2.cvtColor(infer_img, cv2.COLOR_BGR2RGB)
+        detections = self.app.get(img_rgb)
         elapsed_ms = (time.perf_counter() - t0) * 1000
 
         faces = []
-        if isinstance(detections, dict):
-            for key, d in detections.items():
-                fa = d["facial_area"]  # [x1, y1, x2, y2]
-                x1, y1, x2, y2 = fa
-                w, h = x2 - x1, y2 - y1
-                faces.append({
-                    "bbox": [int(x1), int(y1), int(w), int(h)],
-                    "confidence": round(d["score"], 4),
-                    "landmarks": d.get("landmarks", {}),
-                })
-
+        for d in detections:
+            x1, y1, x2, y2 = [int(v) for v in d.bbox]
+            x1 = int(x1 * scale_x); y1 = int(y1 * scale_y)
+            x2 = int(x2 * scale_x); y2 = int(y2 * scale_y)
+            faces.append({
+                "bbox": [x1, y1, x2 - x1, y2 - y1],
+                "confidence": round(float(d.det_score), 4),
+                "landmarks": {},
+            })
         return faces, elapsed_ms
 
 
