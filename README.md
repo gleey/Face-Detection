@@ -27,6 +27,7 @@ face_detection_project/
 │
 ├── results/                          # Output & hasil analisis
 │   └── recognition/                  # Hasil face recognition
+│   └── comparison/                   # Hasil Compare Antar Model Tiap Skenario
 │
 ├── src/                              # Source code utilities
 │   ├── detectors.py                  # Kelas implementasi 3 detektor
