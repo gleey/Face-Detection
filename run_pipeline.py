@@ -7,6 +7,7 @@ Jalankan: python run_pipeline.py
 import cv2
 import pandas as pd
 import json
+import numpy as np
 from pathlib import Path
 from tqdm import tqdm
 
@@ -15,6 +16,21 @@ sys.path.insert(0, str(Path(__file__).parent / "src"))
 
 from detectors import HaarDetector, MTCNNDetector, RetinaFaceDetector
 from visualize import draw_faces, compare_detectors, plot_summary
+
+
+# ─────────────────────────────────────────────
+# FIX: Custom JSON encoder untuk numpy types
+# ─────────────────────────────────────────────
+class NumpyEncoder(json.JSONEncoder):
+    """Konversi numpy int/float/array ke tipe Python native agar bisa di-serialize JSON."""
+    def default(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        if isinstance(obj, np.floating):
+            return float(obj)
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return super().default(obj)
 
 
 # ─────────────────────────────────────────────
@@ -70,6 +86,39 @@ def build_scenario_map():
     return scenarios
 
 
+def sanitize_faces(faces: list) -> list:
+    """
+    Konversi semua nilai numpy di dalam list faces ke tipe Python native
+    agar aman di-serialize ke JSON.
+    """
+    clean = []
+    for f in faces:
+        entry = {}
+        for k, v in f.items():
+            if isinstance(v, np.integer):
+                entry[k] = int(v)
+            elif isinstance(v, np.floating):
+                entry[k] = float(v)
+            elif isinstance(v, np.ndarray):
+                entry[k] = v.tolist()
+            elif isinstance(v, (list, tuple)):
+                # bbox dll — pastikan elemennya juga native
+                entry[k] = [int(x) if isinstance(x, np.integer) else
+                             float(x) if isinstance(x, np.floating) else x
+                             for x in v]
+            elif isinstance(v, dict):
+                # keypoints / landmarks
+                entry[k] = {
+                    pk: (int(pv[0]), int(pv[1])) if isinstance(pv, (list, tuple, np.ndarray))
+                        else pv
+                    for pk, pv in v.items()
+                }
+            else:
+                entry[k] = v
+        clean.append(entry)
+    return clean
+
+
 def process_image(image_path: Path, detectors: dict, person: str, scenario: str,
                   save_comparison=True):
     """Proses satu gambar dengan semua detektor. Return list of result dicts."""
@@ -84,6 +133,9 @@ def process_image(image_path: Path, detectors: dict, person: str, scenario: str,
     for det_name, detector in detectors.items():
         faces, elapsed_ms = detector.detect(image)
 
+        # FIX: bersihkan numpy types sebelum json.dumps
+        faces_clean = sanitize_faces(faces)
+
         results_dict[det_name] = (faces, elapsed_ms)
         row_list.append({
             "image":      image_path.name,
@@ -92,7 +144,7 @@ def process_image(image_path: Path, detectors: dict, person: str, scenario: str,
             "detector":   det_name,
             "n_faces":    len(faces),
             "elapsed_ms": round(elapsed_ms, 2),
-            "faces_json": json.dumps(faces),
+            "faces_json": json.dumps(faces_clean, cls=NumpyEncoder),
         })
 
         # Simpan gambar teranotasi → results/<detector>/<person>/<scenario>/
@@ -104,6 +156,8 @@ def process_image(image_path: Path, detectors: dict, person: str, scenario: str,
 
     # Simpan grid perbandingan 3 detektor
     if save_comparison:
+        import matplotlib
+        matplotlib.use("Agg")   # non-interactive backend — tidak munculkan window
         comp_dir = RESULTS_ROOT / "comparison" / person / scenario
         comp_dir.mkdir(parents=True, exist_ok=True)
         compare_detectors(
@@ -119,6 +173,9 @@ def process_image(image_path: Path, detectors: dict, person: str, scenario: str,
 # MAIN PIPELINE
 # ─────────────────────────────────────────────
 def run():
+    import matplotlib
+    matplotlib.use("Agg")   # pastikan backend non-interactive sejak awal
+
     print("=" * 60)
     print(" FACE DETECTION PIPELINE")
     print(" Haar Cascade | MTCNN | RetinaFace")
@@ -173,6 +230,7 @@ def run():
 
     # ── Chart ─────────────────────────────────
     plot_summary(df, save_path=str(RESULTS_ROOT / "summary_chart.png"))
+    print("\n✅ Pipeline selesai!")
 
 
 if __name__ == "__main__":
