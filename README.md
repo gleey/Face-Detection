@@ -20,6 +20,7 @@ face_detection_project/
 │   │   ├── low_light/                # Kondisi cahaya redup
 │   │   ├── occlusion/                # Wajah tertutup (masker, tangan)
 │   │   └── side_pose/                # Kepala miring kiri/kanan
+│   │   └── small_face/               # Foto wajah dari jarak jauh
 │   ├── orang2/
 │   └── orang3/      
 │
