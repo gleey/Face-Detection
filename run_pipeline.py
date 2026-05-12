@@ -179,7 +179,7 @@ def build_scenario_comparison(all_results, person, scenario, save_path):
     fig, axes = plt.subplots(1, n_det, figsize=(n_det * 4.5, 5), squeeze=False)
     fig.suptitle(
         f"Perbandingan Detektor  —  {person.upper()} / {scenario}\n"
-        f"Foto sampel: {rep_path.name}   (total {len(all_results)} foto di skenario ini)",
+        f"(total {len(all_results)} foto di skenario ini)",
         fontsize=12, fontweight="bold",
     )
 
