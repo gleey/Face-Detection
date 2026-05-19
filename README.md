@@ -37,7 +37,6 @@ face_detection_project/
 ├── livecam_recognition.py            # Real-time recognition dari kamera
 ├── run_pipeline.py                   # Pipeline batch processing
 ├── train.py                          # Training face recognition model
-├── webcam_live.py                    # Real-time detection testing
 ├── requirements.txt                  # Dependencies
 └── README.md                         # Dokumentasi ini
 ```
