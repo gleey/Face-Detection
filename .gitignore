@@ -8,3 +8,6 @@
 *.webp
 *.tiff
 *.pkl
+
+__pycache__/
+*.pyc
