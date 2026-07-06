@@ -47,7 +47,7 @@ face_detection_project/
 |------|-----------|
 | `run_pipeline.py` | Pipeline batch utama untuk menjalankan semua detector pada dataset |
 | `train.py` | Script training model face recognition |
-| `webcam_live.py` | Real-time face detection dari webcam dengan switch detector |
+
 | `livecam_recognition.py` | Real-time face recognition dengan model yang sudah trained |
 | `src/detectors.py` | Implementasi kelas Haar Cascade, MTCNN, RetinaFace |
 | `src/visualize.py` | Visualisasi detection results dan chart ringkasan |
@@ -80,7 +80,7 @@ Output akan tersimpan di folder `results/recognition/`
 
 ### 4. Real-Time Webcam Detection
 ```bash
-python webcam_live.py
+python livecam_recognition.py
 ```
 
 **Kontrol:**
